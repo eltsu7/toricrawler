@@ -6,4 +6,7 @@ This script reads a tori.fi search result page once a minute and posts updates g
 
 ## How to use
 
-Install everything from `requirements.txt`. Download `chromedriver.exe` and place in root folder. Copy `env.sample`, fill out the information and rename to `env.py`. Run `main.py` with python 3.
+1. Install everything from `requirements.txt`.
+2. Download `chromedriver.exe` and place in root folder.
+3. Copy `env.sample`, fill out the information and rename to `env.py`.
+4. Run `main.py` with python 3.
