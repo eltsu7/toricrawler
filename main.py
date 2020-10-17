@@ -10,6 +10,9 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from env import tg_token, tg_chats, tori_link
 
+old_listings = {}
+
+
 class Listing():
     def __init__(self, id, link, title, price, image, age, listingtype):
         self.id = id
@@ -20,7 +23,6 @@ class Listing():
         self.age = age
         self.listingtype = listingtype
 
-listinglist = {}
 
 def print_listing(listing):
     print(f'{listing.listingtype}, {listing.id}: {listing.price}, {listing.age}, {listing.title}')
@@ -32,13 +34,14 @@ def update_listinglist(bot, first_time):
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     options.add_argument('--log-level=3')
-    driver = webdriver.Chrome(chrome_options=options)
+    driver = webdriver.Chrome(options=options)
 
     driver.get(tori_link)
 
+    current_listings = {}
+
     items = driver.find_elements(By.CSS_SELECTOR, '[id^=item_]')
     for i in items:
-
         id = i.get_attribute('id')
         link = i.get_attribute('href')
         title = ''
@@ -79,12 +82,18 @@ def update_listinglist(bot, first_time):
 
         listing = Listing(id, link, title, price, image, age, listingtype)
 
-        if id not in listinglist and not first_time:
-            newlisting(bot, listing)
+        current_listings[id] = listing
 
-        listinglist[id] = listing
+    if not first_time:
+        global old_listings
+        for ls in current_listings:
+            if ls not in old_listings:
+                newlisting(bot, current_listings[ls])
+
+    old_listings = current_listings
 
     driver.quit()
+    print('Finished updating at ' + str(datetime.now()))
 
 def newlisting(bot, listing):
     print_listing(listing)
