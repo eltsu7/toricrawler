@@ -1,3 +1,4 @@
 env.py
 chromedriver.exe
 __pycache__
+*.log
