@@ -117,7 +117,7 @@ def main():
     if len(sys.argv) == 2 and sys.argv[1] == 'test':
         test = True
     else:
-        False
+        test = False
 
     while True:
         update_listinglist(bot, first_time, test)
