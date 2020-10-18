@@ -1,4 +1,5 @@
 import time
+import sys
 from datetime import datetime
 
 from selenium import webdriver
@@ -27,7 +28,7 @@ class Listing():
 def print_listing(listing):
     print(f'{listing.listingtype}, {listing.id}: {listing.price}, {listing.age}, {listing.title}')
 
-def update_listinglist(bot, first_time):
+def update_listinglist(bot, first_time, test):
     print('Updating at ' + str(datetime.now()))
 
     options = webdriver.ChromeOptions()
@@ -84,6 +85,10 @@ def update_listinglist(bot, first_time):
 
         current_listings[id] = listing
 
+        if test:
+            newlisting(bot, listing)
+            test = False
+
     if not first_time:
         global old_listings
         for ls in current_listings:
@@ -97,9 +102,10 @@ def update_listinglist(bot, first_time):
 
 def newlisting(bot, listing):
     print_listing(listing)
-    text = f'{listing.listingtype}: {listing.title}, {listing.price}, {listing.age}\n{listing.link}'
+    text = f'{listing.listingtype[0]}: {listing.price}, {listing.title} <a href="{listing.link}">Linkki</a>'
+    print(text)
     for chat in tg_chats:
-        bot.send_message(chat_id=chat, text=text)
+        bot.send_message(chat_id=chat, text=text, parse_mode="HTML")
 
 def main():
     updater = Updater(tg_token, use_context=True)
@@ -109,8 +115,14 @@ def main():
 
     first_time = True
 
+    if len(sys.argv) == 2 and sys.argv[1] == 'test':
+        test = True
+    else:
+        False
+
     while True:
-        update_listinglist(bot, first_time)
+        update_listinglist(bot, first_time, test)
+        test = False
         time.sleep(60)
         first_time = False
 
