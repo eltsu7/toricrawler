@@ -102,7 +102,11 @@ def update_listinglist(bot, first_time, test):
 
 def newlisting(bot, listing):
     print_listing(listing)
-    text = f'{listing.listingtype[0]}: {listing.price}, {listing.title}, <a href="{listing.link}">Retkahda</a>'
+    if listing.price:
+        price = listing.price
+    else:
+        price = "-- €"
+    text = f'{listing.listingtype[0]}: {price}, {listing.title}, <a href="{listing.link}">Retkahda</a>'
     for chat in tg_chats:
         bot.send_message(chat_id=chat, text=text, parse_mode="HTML")
 
