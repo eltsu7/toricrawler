@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
 from telegram import Bot
+from telegram.error import TimedOut
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from env import tg_token, tg_chats, tori_link
@@ -108,7 +109,13 @@ def newlisting(bot, listing):
         price = "-- €"
     text = f'{listing.listingtype[0]}: {price}, {listing.title}, <a href="{listing.link}">Retkahda</a>'
     for chat in tg_chats:
-        bot.send_message(chat_id=chat, text=text, parse_mode="HTML")
+        while True:
+            try:
+                bot.send_message(chat_id=chat, text=text, parse_mode="HTML")
+            except TimedOut:
+                time.sleep(5)
+                continue
+            break   
 
 def main():
     updater = Updater(tg_token, use_context=True)
