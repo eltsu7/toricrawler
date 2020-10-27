@@ -112,6 +112,7 @@ def newlisting(bot, listing):
         while True:
             try:
                 bot.send_message(chat_id=chat, text=text, parse_mode="HTML")
+                time.sleep(2)
             except TimedOut:
                 time.sleep(5)
                 continue
