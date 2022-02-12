@@ -82,6 +82,9 @@ def update_listinglist(bot, first_time, test):
         except NoSuchElementException:
             pass
 
+        if listingtype == "" or title == "":
+            continue
+
         listing = Listing(id, link, title, price, image, age, listingtype)
 
         current_listings[id] = listing
