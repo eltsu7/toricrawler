@@ -82,9 +82,6 @@ def update_listinglist(bot, first_time, test):
         except NoSuchElementException:
             pass
 
-        if listingtype == "" or title == "":
-            continue
-
         listing = Listing(id, link, title, price, image, age, listingtype)
 
         current_listings[id] = listing
@@ -106,10 +103,15 @@ def update_listinglist(bot, first_time, test):
 
 def newlisting(bot, listing):
     print_listing(listing)
+
     if listing.price:
         price = listing.price
     else:
         price = "-- €"
+
+    if not listing.listingtype or not listing.title:
+        return
+
     text = f'{listing.listingtype[0]}: {price}, {listing.title}, <a href="{listing.link}">Retkahda</a>'
     for chat in tg_chats:
         while True:
