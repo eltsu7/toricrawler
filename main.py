@@ -31,7 +31,7 @@ def print_listing(listing):
     # Console logging
     print(f'{listing.listingtype}, {listing.id}: {listing.price}, {listing.age}, {listing.title}')
 
-def new_pagelist(bot, first_time, test):
+def new_pagelist():
     # Read the page and pushes a new (dict)pagelist to (list)pagelists. Deletes old ones if pages_to_keep cap is met.
 
     print('Gathering new list at ' + str(datetime.now()))
