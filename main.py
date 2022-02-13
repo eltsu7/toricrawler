@@ -38,7 +38,10 @@ def update_listinglist(bot, first_time, test):
     options.add_argument('--log-level=3')
     driver = webdriver.Chrome(options=options)
 
-    driver.get(tori_link)
+    try:
+        driver.get(tori_link)
+    except:
+        return
 
     current_listings = {}
 
