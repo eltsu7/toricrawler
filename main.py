@@ -115,9 +115,9 @@ def announce_new_listings(bot, test, first_run):
                 break
         
         if not found and not first_run:
-            send_listing_message(bot, listing)
+            send_listing_message(bot, pagelists[0][listing])
         elif test:
-            send_listing_message(bot, listing)
+            send_listing_message(bot, pagelists[0][listing])
             test = False
 
 def send_listing_message(bot, listing):
