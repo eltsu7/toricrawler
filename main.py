@@ -12,7 +12,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from env import tg_token, tg_chats, tori_link
 
-old_listings = {}
+pagelists = []
+pages_to_keep = 3
 
 
 class Listing():
@@ -27,10 +28,13 @@ class Listing():
 
 
 def print_listing(listing):
+    # Console logging
     print(f'{listing.listingtype}, {listing.id}: {listing.price}, {listing.age}, {listing.title}')
 
-def update_listinglist(bot, first_time, test):
-    print('Updating at ' + str(datetime.now()))
+def new_pagelist(bot, first_time, test):
+    # Read the page and pushes a new (dict)pagelist to (list)pagelists. Deletes old ones if pages_to_keep cap is met.
+
+    print('Gathering new list at ' + str(datetime.now()))
 
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
@@ -43,7 +47,7 @@ def update_listinglist(bot, first_time, test):
     except:
         return
 
-    current_listings = {}
+    pagelist = {}
 
     items = driver.find_elements(By.CSS_SELECTOR, '[id^=item_]')
     for i in items:
@@ -87,24 +91,38 @@ def update_listinglist(bot, first_time, test):
 
         listing = Listing(id, link, title, price, image, age, listingtype)
 
-        current_listings[id] = listing
+        pagelist[id] = listing
 
-        if test:
-            newlisting(bot, listing)
-            test = False
+    global pagelists
+    global pages_to_keep
+    pagelists.insert(0, pagelist)
 
-    if not first_time:
-        global old_listings
-        for ls in current_listings:
-            if ls not in old_listings:
-                newlisting(bot, current_listings[ls])
-
-    old_listings = current_listings
+    if len(pagelist) > pages_to_keep:
+        pagelists = pagelists[:pages_to_keep]
 
     driver.quit()
-    print('Finished updating at ' + str(datetime.now()))
+    print('Finished at ' + str(datetime.now()))
 
-def newlisting(bot, listing):
+def announce_new_listings(bot, test, first_run):
+    # Go through the latest pagelist and announce listings that aren't in the older ones.
+
+    global pagelists
+    for listing in pagelists[0]:
+        found = False
+        for old_page in pagelists[1:]:
+            if listing in old_page:
+                found = True
+                break
+        
+        if not found and not first_run:
+            send_listing_message(bot, listing)
+        elif test:
+            send_listing_message(bot, listing)
+            test = False
+
+def send_listing_message(bot, listing):
+    # Sends message to telegram chat
+
     print_listing(listing)
 
     if listing.price:
@@ -132,7 +150,8 @@ def main():
 
     updater.start_polling()
 
-    first_time = True
+    # Don't announce anything on the first run
+    first_run = True
 
     if len(sys.argv) == 2 and sys.argv[1] == 'test':
         test = True
@@ -140,9 +159,10 @@ def main():
         test = False
 
     while True:
-        update_listinglist(bot, first_time, test)
+        new_pagelist()
+        announce_new_listings(bot, test, first_run)
         test = False
+        first_run = False
         time.sleep(120)
-        first_time = False
 
 main()
